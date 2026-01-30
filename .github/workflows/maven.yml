@@ -11,11 +11,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # 🔐 Secrets injected here (safe)
+    env:
+      APP_USERNAME: ${{ secrets.APP_USERNAME }}
+      APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Force Java 21 (this is the key fix)
+      # Force Java 21
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -23,7 +28,7 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # Hard verification (will print actual Java used)
+      # Verify environment (secrets are masked automatically)
       - name: Verify Java & Maven versions
         run: |
           echo "JAVA_HOME=$JAVA_HOME"
