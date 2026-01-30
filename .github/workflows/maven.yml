@@ -1,39 +1,10 @@
-# name: Java CI with Maven
-
-# on:
-#   push:
-#     branches: [ "master", "main" ]
-#   pull_request:
-#     branches: [ "master", "main" ]
-#   workflow_dispatch:
-
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v4
-
-#       - name: Set up JDK 21
-#         uses: actions/setup-java@v4
-#         with:
-#           distribution: 'temurin'
-#           java-version: '21'
-#           cache: maven
-
-#       - name: Build with Maven
-#         run: mvn -B clean package
-
-#       - name: Run tests
-#         run: mvn test
 name: Java CI with Maven
 
 on:
   push:
-    branches: [ "master", "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "master", "main" ]
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -44,20 +15,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Force Java 21 (this is the key fix)
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: temurin
           java-version: '21'
           cache: maven
 
+      # Hard verification (will print actual Java used)
       - name: Verify Java & Maven versions
         run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          which java
           java -version
           mvn -version
 
-      - name: Build with Maven
-        run: mvn -B clean package
+      # Jenkins: stage('Build')
+      - name: Build (skip tests)
+        run: mvn -B -DskipTests clean package
 
+      # Jenkins: stage('Test')
       - name: Run tests
         run: mvn test
